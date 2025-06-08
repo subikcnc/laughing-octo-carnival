@@ -29,9 +29,25 @@ const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
+
+// Resize event listener
+window.addEventListener("resize", function () {
+  // Update the sizes
+  sizes.width = this.window.innerWidth;
+  sizes.height = this.window.innerHeight;
+
+  // Update the camera's aspect ratio
+  camera.aspect = sizes.width / sizes.height;
+  // We also need to update the projection matrix
+  camera.updateProjectionMatrix();
+  // We also need to update the renderer
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio), 2);
+});
+
 // Camera
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -48,6 +64,8 @@ camera.lookAt(mesh.position);
 scene.add(camera);
 
 const controls = new OrbitControls(camera, canvas);
+// To disable the controls we can do
+// controls.enabled = false;
 controls.enableDamping = true;
 
 // Webgl Renderer
@@ -56,6 +74,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio), 2);
 renderer.render(scene, camera);
 
 // Time
