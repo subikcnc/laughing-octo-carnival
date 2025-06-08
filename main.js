@@ -21,8 +21,13 @@ const sizes = {
     height: 600
 }
 // Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height) // The initial value is the field of view and the second is the aspect
-camera.position.z = 3;
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100) // The initial value is the field of view and the second is the aspect
+const aspectRatio = sizes.width / sizes.height;
+// const camera = new THREE.OrthographicCamera(-1*aspectRatio,1*aspectRatio,1,-1,0.1,100)
+// camera.position.z = 2;
+// camera.position.y = 2;
+camera.position.x = 2;
+camera.lookAt(mesh.position)
 scene.add(camera)
 
 // Webgl Renderer
@@ -41,7 +46,7 @@ const tick = () => {
    const elapsedTime = clock.getElapsedTime()
 
     // Update object
-    mesh.rotation.y = elapsedTime;
+    // mesh.rotation.y = elapsedTime;
     // Render
     renderer.render(scene, camera);
     window.requestAnimationFrame(tick)
