@@ -1,5 +1,16 @@
 import * as THREE from 'three'
 
+// Cursor
+const cursor = {
+    x: 0,
+    y: 0,
+}
+window.addEventListener('mousemove', (event) => {
+    cursor.x = event.clientX / sizes.width - 0.5
+    cursor.y = -(event.clientY / sizes.height - 0.5)
+    console.log(cursor.x)
+})
+
 // Canvas
 const canvas = document.querySelector('canvas')
 
@@ -24,9 +35,9 @@ const sizes = {
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100) // The initial value is the field of view and the second is the aspect
 const aspectRatio = sizes.width / sizes.height;
 // const camera = new THREE.OrthographicCamera(-1*aspectRatio,1*aspectRatio,1,-1,0.1,100)
-// camera.position.z = 2;
+camera.position.z = 2;
 // camera.position.y = 2;
-camera.position.x = 2;
+// camera.position.x = 2;
 camera.lookAt(mesh.position)
 scene.add(camera)
 
@@ -48,6 +59,13 @@ const tick = () => {
     // Update object
     // mesh.rotation.y = elapsedTime;
     // Render
+
+    // Update camera
+    camera.position.x = Math.sin(cursor.x * Math.PI*2) * 3
+    camera.position.z = Math.cos(cursor.x * Math.PI*2) * 3
+    camera.position.y = cursor.y * 5
+    // look at should be done after positioning the camera
+    camera.lookAt(mesh.position)
     renderer.render(scene, camera);
     window.requestAnimationFrame(tick)
 }
