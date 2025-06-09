@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import GUI from 'lil-gui'
 
 // Debug
@@ -23,15 +24,46 @@ const canvas = document.querySelector("canvas");
 // Scene
 const scene = new THREE.Scene();
 
+// Textures
+const textureLoader = new THREE.TextureLoader();
+const particleTexture = textureLoader.load('./circle.svg')
+
+// Particles
+// Geometry
+const particlesGeometry = new THREE.BufferGeometry()  
+const count = 5000; // Particles count is 500
+
+// Adding vertices to 
+const positions = new Float32Array(count*3) // count*3 items in the array
+
+for(let i=0; i < count*3; i++) {
+  positions[i] = (Math.random() - 0.5) * 10
+}
+
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions,3))
+
+// Material
+const particlesMaterial = new THREE.PointsMaterial({
+  size: 0.02, // size of the particle
+  sizeAttenuation: true // make size of particle small if it is farther from the camera
+})
+particlesMaterial.color = new THREE.Color('papayawhip')
+particlesMaterial.map = particleTexture
+
+// Points
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+scene.add(particles)
+
+
 // Object
 const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const material = new THREE.MeshBasicMaterial({ color: 'papayawhip' });
 const mesh = new THREE.Mesh(geometry, material);
 // mesh.position.y = 1;
 // mesh.position.z = 1;
 
 // Adding the object to the scene
-scene.add(mesh);
+// scene.add(mesh);
 gui.add(mesh.position, 'y').min(-3).max(3).step(0.01).name('elevation')
 gui.add(mesh, 'visible')
 gui.add(material,'wireframe')
