@@ -47,6 +47,8 @@ particlesGeometry.setAttribute(
 );
 particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
+// console.log(particlesGeometry.attributes.position.array);
+
 // Material
 const particlesMaterial = new THREE.PointsMaterial({
   size: 0.02, // size of the particle
@@ -139,6 +141,15 @@ const tick = () => {
 
   // Update Particles
   // particles.position.y = elapsedTime * 0.03;
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const x = particlesGeometry.attributes.position.array[i3];
+    particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(
+      elapsedTime * 0.1 + x,
+    );
+  }
+
+  particlesGeometry.attributes.position.needsUpdate = true;
 
   // Update object
   // mesh.rotation.y = elapsedTime;
