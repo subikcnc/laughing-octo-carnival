@@ -1,11 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import GUI from 'lil-gui'
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import GUI from "lil-gui";
 
 // Debug
 const gui = new GUI();
-
 
 // Cursor
 const cursor = {
@@ -26,48 +25,61 @@ const scene = new THREE.Scene();
 
 // Textures
 const textureLoader = new THREE.TextureLoader();
-const particleTexture = textureLoader.load('./circle.svg')
+const particleTexture = textureLoader.load("./star.png");
 
 // Particles
 // Geometry
-const particlesGeometry = new THREE.BufferGeometry()  
+const particlesGeometry = new THREE.BufferGeometry();
 const count = 5000; // Particles count is 500
 
-// Adding vertices to 
-const positions = new Float32Array(count*3) // count*3 items in the array
+// Adding vertices to
+const positions = new Float32Array(count * 3); // count*3 items in the array
+const colors = new Float32Array(count * 3);
 
-for(let i=0; i < count*3; i++) {
-  positions[i] = (Math.random() - 0.5) * 10
+for (let i = 0; i < count * 3; i++) {
+  positions[i] = (Math.random() - 0.5) * 10;
+  colors[i] = Math.random();
 }
 
-particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions,3))
+particlesGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positions, 3),
+);
+particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
 // Material
 const particlesMaterial = new THREE.PointsMaterial({
   size: 0.02, // size of the particle
-  sizeAttenuation: true // make size of particle small if it is farther from the camera
-})
-particlesMaterial.color = new THREE.Color('papayawhip')
-particlesMaterial.map = particleTexture
+  sizeAttenuation: true, // make size of particle small if it is farther from the camera
+});
+particlesMaterial.color = new THREE.Color("papayawhip");
+particlesMaterial.transparent = true;
+particlesMaterial.alphaMap = particleTexture;
+particlesMaterial.map = particleTexture;
+// particlesMaterial.depthTest = false;
+particlesMaterial.depthWrite = false;
+// particlesMaterial.blending = THREE.AdditiveBlending;
+particlesMaterial.vertexColors = true;
 
 // Points
-const particles = new THREE.Points(particlesGeometry, particlesMaterial)
-scene.add(particles)
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
 
+// Cube
 
 // Object
 const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 'papayawhip' });
+const material = new THREE.MeshBasicMaterial({ color: "rebeccapurple" });
 const mesh = new THREE.Mesh(geometry, material);
 // mesh.position.y = 1;
 // mesh.position.z = 1;
 
 // Adding the object to the scene
 // scene.add(mesh);
-gui.add(mesh.position, 'y').min(-3).max(3).step(0.01).name('elevation')
-gui.add(mesh, 'visible')
-gui.add(material,'wireframe')
-gui.addColor(material, 'color')
+gui.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
+gui.add(mesh, "visible");
+gui.add(material, "wireframe");
+gui.addColor(material, "color");
 
 const sizes = {
   width: window.innerWidth,
@@ -124,6 +136,9 @@ const clock = new THREE.Clock();
 // Animation
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  // Update Particles
+  // particles.position.y = elapsedTime * 0.03;
 
   // Update object
   // mesh.rotation.y = elapsedTime;
