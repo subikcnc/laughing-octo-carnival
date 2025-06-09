@@ -1,5 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import GUI from 'lil-gui'
+
+// Debug
+const gui = new GUI();
+
 
 // Cursor
 const cursor = {
@@ -27,6 +32,10 @@ const mesh = new THREE.Mesh(geometry, material);
 
 // Adding the object to the scene
 scene.add(mesh);
+gui.add(mesh.position, 'y').min(-3).max(3).step(0.01).name('elevation')
+gui.add(mesh, 'visible')
+gui.add(material,'wireframe')
+gui.addColor(material, 'color')
 
 const sizes = {
   width: window.innerWidth,
