@@ -4,9 +4,9 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import GUI from "lil-gui";
 
 // Debug
-const gui = new GUI();
+const gui = new GUI({width: 360});
 
-// Cursor
+// CURSOR
 const cursor = {
   x: 0,
   y: 0,
@@ -23,65 +23,115 @@ const canvas = document.querySelector("canvas");
 // Scene
 const scene = new THREE.Scene();
 
-// Textures
-const textureLoader = new THREE.TextureLoader();
-const particleTexture = textureLoader.load("./star.png");
+/**
+ *  GALAXY
+*/
+const parameters = {}
+parameters.count = 10000
+parameters.size = .02;
+let geometry = null;
+let material = null;
+let points = null;
 
-// Particles
-// Geometry
-const particlesGeometry = new THREE.BufferGeometry();
-const count = 5000; // Particles count is 500
+const generateGalaxy = () => {
+  // Destroy old galaxy
+  if(geometry !== null){
+    geometry.dispose();
+    material.dispose();
+    scene.remove(points)
+  }
+  geometry = new THREE.BufferGeometry()
+  const positions = new Float32Array(parameters.count*3)
 
-// Adding vertices to
-const positions = new Float32Array(count * 3); // count*3 items in the array
-const colors = new Float32Array(count * 3);
+  for(let i=0; i<parameters.count; i++) {
+    const i3 = i * 3;
 
-for (let i = 0; i < count * 3; i++) {
-  positions[i] = (Math.random() - 0.5) * 10;
-  colors[i] = Math.random();
+    positions[i3] = (Math.random() - 0.5) * 3;
+    positions[i3+1] = (Math.random() - 0.5) * 3;
+    positions[i3+2] = (Math.random() - 0.5) * 3;
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+    // Material
+    material = new THREE.PointsMaterial({
+      size: parameters.size,
+      sizeAttenuation: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    })
+
+    // Points
+    points = new THREE.Points(geometry, material)
+    scene.add(points)
+  }
 }
 
-particlesGeometry.setAttribute(
-  "position",
-  new THREE.BufferAttribute(positions, 3),
-);
-particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+generateGalaxy()
 
-// console.log(particlesGeometry.attributes.position.array);
+// gui.add(parameters, 'count').min(100).max(10000).step(100).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'size').min(.001).max(.1).step(.001).onFinishChange(generateGalaxy)
 
-// Material
-const particlesMaterial = new THREE.PointsMaterial({
-  size: 0.02, // size of the particle
-  sizeAttenuation: true, // make size of particle small if it is farther from the camera
-});
-particlesMaterial.color = new THREE.Color("papayawhip");
-particlesMaterial.transparent = true;
-particlesMaterial.alphaMap = particleTexture;
-particlesMaterial.map = particleTexture;
-// particlesMaterial.depthTest = false;
-particlesMaterial.depthWrite = false;
-// particlesMaterial.blending = THREE.AdditiveBlending;
-particlesMaterial.vertexColors = true;
 
-// Points
-const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-scene.add(particles);
+/* PARTICLES */
+// Textures
+// const textureLoader = new THREE.TextureLoader();
+// const particleTexture = textureLoader.load("./star.png");
 
-// Cube
+// // Particles
+// // Geometry
+// const particlesGeometry = new THREE.BufferGeometry();
+// const count = 5000; // Particles count is 500
+
+// // Adding vertices to
+// const positions = new Float32Array(count * 3); // count*3 items in the array
+// const colors = new Float32Array(count * 3);
+
+// for (let i = 0; i < count * 3; i++) {
+//   positions[i] = (Math.random() - 0.5) * 10;
+//   colors[i] = Math.random();
+// }
+
+// particlesGeometry.setAttribute(
+//   "position",
+//   new THREE.BufferAttribute(positions, 3),
+// );
+// particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+// // console.log(particlesGeometry.attributes.position.array);
+
+// // Material
+// const particlesMaterial = new THREE.PointsMaterial({
+//   size: 0.02, // size of the particle
+//   sizeAttenuation: true, // make size of particle small if it is farther from the camera
+// });
+// particlesMaterial.color = new THREE.Color("papayawhip");
+// particlesMaterial.transparent = true;
+// particlesMaterial.alphaMap = particleTexture;
+// particlesMaterial.map = particleTexture;
+// // particlesMaterial.depthTest = false;
+// particlesMaterial.depthWrite = false;
+// // particlesMaterial.blending = THREE.AdditiveBlending;
+// particlesMaterial.vertexColors = true;
+
+// // Points
+// const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+// scene.add(particles);
+
+/* CUBE */ 
 
 // Object
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: "rebeccapurple" });
-const mesh = new THREE.Mesh(geometry, material);
-// mesh.position.y = 1;
-// mesh.position.z = 1;
+// const geometry = new THREE.BoxGeometry(1, 1, 1);
+// const material = new THREE.MeshBasicMaterial({ color: "rebeccapurple" });
+// const mesh = new THREE.Mesh(geometry, material);
+// // mesh.position.y = 1;
+// // mesh.position.z = 1;
 
-// Adding the object to the scene
-// scene.add(mesh);
-gui.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
-gui.add(mesh, "visible");
-gui.add(material, "wireframe");
-gui.addColor(material, "color");
+// // Adding the object to the scene
+// // scene.add(mesh);
+// gui.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
+// gui.add(mesh, "visible");
+// gui.add(material, "wireframe");
+// gui.addColor(material, "color");
 
 const sizes = {
   width: window.innerWidth,
@@ -115,7 +165,7 @@ const aspectRatio = sizes.width / sizes.height;
 camera.position.z = 2;
 // camera.position.y = 2;
 // camera.position.x = 2;
-camera.lookAt(mesh.position);
+// camera.lookAt(mesh.position);
 scene.add(camera);
 
 const controls = new OrbitControls(camera, canvas);
@@ -141,15 +191,15 @@ const tick = () => {
 
   // Update Particles
   // particles.position.y = elapsedTime * 0.03;
-  for (let i = 0; i < count; i++) {
-    const i3 = i * 3;
-    const x = particlesGeometry.attributes.position.array[i3];
-    particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(
-      elapsedTime * 0.1 + x,
-    );
-  }
+  // for (let i = 0; i < count; i++) {
+  //   const i3 = i * 3;
+  //   const x = particlesGeometry.attributes.position.array[i3];
+  //   particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(
+  //     elapsedTime * 0.1 + x,
+  //   );
+  // }
 
-  particlesGeometry.attributes.position.needsUpdate = true;
+  // particlesGeometry.attributes.position.needsUpdate = true;
 
   // Update object
   // mesh.rotation.y = elapsedTime;
@@ -163,7 +213,7 @@ const tick = () => {
   //   camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
   //   camera.position.y = cursor.y * 5;
   // look at should be done after positioning the camera
-  camera.lookAt(mesh.position);
+  // camera.lookAt(mesh.position);
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
 };
