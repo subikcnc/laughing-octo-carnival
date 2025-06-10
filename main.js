@@ -27,8 +27,9 @@ const scene = new THREE.Scene();
  *  GALAXY
 */
 const parameters = {}
-parameters.count = 10000
+parameters.count = 1000
 parameters.size = .02;
+parameters.radius = 5;
 let geometry = null;
 let material = null;
 let points = null;
@@ -60,16 +61,17 @@ const generateGalaxy = () => {
       blending: THREE.AdditiveBlending
     })
 
-    // Points
-    points = new THREE.Points(geometry, material)
-    scene.add(points)
   }
+  // Points
+  points = new THREE.Points(geometry, material)
+  scene.add(points)
 }
 
 generateGalaxy()
 
-// gui.add(parameters, 'count').min(100).max(10000).step(100).onFinishChange(generateGalaxy)
-// gui.add(parameters, 'size').min(.001).max(.1).step(.001).onFinishChange(generateGalaxy)
+gui.add(parameters, 'count').min(500).max(100000).step(100).onFinishChange(generateGalaxy)
+gui.add(parameters, 'size').min(.001).max(.1).step(.001).onFinishChange(generateGalaxy)
+gui.add(parameters, 'radius').min(.01).max(20).step(.01).onFinishChange(generateGalaxy)
 
 
 /* PARTICLES */
